@@ -10,7 +10,10 @@ $app->get('/info',function() use($app) {
 
 $app->get('/get_timeline',function() use($app) {
     $con = $app['db'];
-    $sql = 'SELECT id, body FROM tweets WHERE user_id IN (SELECT source_id FROM follows WHERE destination_id = ?) ORDER BY created_at DESC LIMIT 20)';
+    // シンプルだけど遅いクエリ
+    // cf. http://www.atmarkit.co.jp/news/201004/19/twitter.html
+    // $sql = 'SELECT id, body FROM tweets WHERE user_id IN (SELECT source_id FROM follows WHERE destination_id = ?) ORDER BY created_at DESC LIMIT 20)';
+    $sql = 'SELECT id, body FROM tweets WHERE id IN (SELECT tweet_id  FROM timeline WHERE user_id = ?) ORDER BY created_at DESC LIMIT 20)';
     $sth = $con->prepare($sql);
     $sth->execute(array(mt_rand(1, 100000)));
     $results = $sth->fetchAll();

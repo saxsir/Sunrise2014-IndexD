@@ -1,0 +1,16 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<title>Sunrise2014</title>
+
+{% if tweets %}
+
+  <ul>
+    {% for tweet in tweets %}
+      <li>{{ message.id }}: {{ message.body }}</li>
+    {% endfor %}
+  </ul>
+
+{% endif %}
+
+{% endblock %}
