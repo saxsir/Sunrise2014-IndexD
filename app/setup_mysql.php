@@ -21,42 +21,71 @@ define("MAX_USER", 10000);
 define("MAX_TWEET", 10000);
 define("MAX_FOLLOWER", 10000);
 
+
 // ユーザーデータのinsert
-echo "Insert user data..."
-$range = range(1, MAX_USER);
-foreach ($range as $i) {
-  $name = "ユーザーネーム" . $i;
-  $screen_name = "スクリーンネーム" . $i;
-  $sql = "INSERT INTO `users` (name, screen_name, profile, created_at, updated_at) values ($name, $screen_name, 'hogehoge', now(), now())";
-  $sth = $con->prepare($sql);
-  $sth->execute();
+$sql = 'select count(*) as count from users';
+$sth = $con->prepare($sql);
+$sth->execute();
+$result = $sth->fetch(PDO::FETCH_BOTH);
+if($result['count'] > 0) {
+  $message = 'データが存在します。';
+} else {
+  echo "Insert user data...";
+  $range = range(1, MAX_USER);
+  foreach ($range as $i) {
+    $name = "ユーザーネーム" . $i;
+    $screen_name = "スクリーンネーム" . $i;
+    $sql = "INSERT INTO `users` (name, screen_name, profile, created_at, updated_at) values (?, ?, 'hogehoge', now(), now())";
+    $sth = $con->prepare($sql);
+    $sth->execute(array($name, $screen_name));
+  }
 }
 
 // followerデータのinsert
-echo "Insert follower data..."
-$range = range(1, MAX_FOLLOWER);
-foreach ($range as $i) {
-  $sid = rand(1, MAX_USER);
-  $did = rand(1, MAX_USER); //きっと一致することはない...
+$sql = 'select count(*) as count from followers';
+$sth = $con->prepare($sql);
+$sth->execute();
+$result = $sth->fetch(PDO::FETCH_BOTH);
 
-  $sql = "INSERT INTO `followers` (source_id, destination_id) values ($sid, $did)";
-  $sth = $con->prepare($sql);
-  $sth->execute();
+if($result['count'] > 0) {
+  $message = 'データが存在します。';
+} else {
+  echo "Insert follower data...\n";
+  $range = range(1, MAX_FOLLOWER);
+  foreach ($range as $i) {
+    $sid = rand(1, MAX_USER);
+    $did = rand(1, MAX_USER); //きっと一致することはない...
+
+    $sql = "INSERT INTO `followers` (source_id, destination_id) values (?, ?)";
+    $sth = $con->prepare($sql);
+    $sth->execute(array($sid, $did));
+  }
 }
 
-// tweetデータのinsert
-echo "Insert tweet data..."
-$range = range(1, MAX_TWEET);
-foreach ($range as $i) {
-  $rand = rand(1, 111111);
-  $user_id = rand(1, MAX_USER);
-  $screen_name = "スクリーンネーム" . $user_id;
-  $time = time();
-  $body = "Body_".$screen_name . " " . $time;
 
-  $sql = "INSERT INTO `tweets` (user_id, screen_name, body, created_at) values ($user_id, $screen_name, $body, now())";
-  $sth = $con->prepare($sql);
-  $sth->execute();
+
+// tweetデータのinsert
+$sql = 'select count(*) as count from tweets';
+$sth = $con->prepare($sql);
+$sth->execute();
+$result = $sth->fetch(PDO::FETCH_BOTH);
+
+if($result['count'] > 0) {
+  $message = 'データが存在します。';
+} else {
+  echo "Insert tweet data...";
+  $range = range(1, MAX_TWEET);
+  foreach ($range as $i) {
+    $rand = rand(1, 111111);
+    $user_id = rand(1, MAX_USER);
+    $screen_name = "スクリーンネーム" . $user_id;
+    $time = time();
+    $body = "Body_".$screen_name . " " . $time;
+
+    $sql = "INSERT INTO `tweets` (user_id, screen_name, body, created_at) values (?, ?, ?, now())";
+    $sth = $con->prepare($sql);
+    $sth->execute(array($user_id, $screen_name, $body));
+  }
 }
 
 $message = 'finished';
