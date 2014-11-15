@@ -18,8 +18,8 @@ $app['db'] = function() use($app,$host,$mysqldConfig){
 $con = $app['db'];
 
 define("MAX_USER", 10000);
-define("MAX_TWEET", 10000);
-define("MAX_FOLLOWER", 10000);
+define("MAX_TWEET", 100000);
+define("MAX_FOLLOWEE", 10000);
 
 
 // ユーザーデータのinsert
@@ -41,8 +41,8 @@ if($result['count'] > 0) {
   }
 }
 
-// followerデータのinsert
-$sql = 'select count(*) as count from followers';
+// followeeデータのinsert
+$sql = 'select count(*) as count from followee';
 $sth = $con->prepare($sql);
 $sth->execute();
 $result = $sth->fetch(PDO::FETCH_BOTH);
@@ -50,19 +50,17 @@ $result = $sth->fetch(PDO::FETCH_BOTH);
 if($result['count'] > 0) {
   $message = 'データが存在します。';
 } else {
-  echo "Insert follower data...\n";
-  $range = range(1, MAX_FOLLOWER);
+  echo "Insert followee data...\n";
+  $range = range(1, MAX_FOLLOWEE);
   foreach ($range as $i) {
     $sid = rand(1, MAX_USER);
     $did = rand(1, MAX_USER); //きっと一致することはない...
 
-    $sql = "INSERT INTO `followers` (source_id, destination_id) values (?, ?)";
+    $sql = "INSERT INTO `followee` (source_id, destination_id) values (?, ?)";
     $sth = $con->prepare($sql);
     $sth->execute(array($sid, $did));
   }
 }
-
-
 
 // tweetデータのinsert
 $sql = 'select count(*) as count from tweets';
